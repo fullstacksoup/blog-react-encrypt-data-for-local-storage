@@ -1,13 +1,8 @@
-import { useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
-
-
 export default function SearchForm(props) {
-
-
   return (
     <Box
       component="form"
@@ -24,6 +19,7 @@ export default function SearchForm(props) {
           id="searchStr"
           label="Search"
           onChange={(e) => props.handleChangeSearchTerm(e)}
+          onKeyDown={(e) => props.handleKeyPress(e)}
           defaultValue=""
           value={props.searchTerm}
           InputLabelProps={{ shrink: true }} 
@@ -37,9 +33,7 @@ export default function SearchForm(props) {
           >
           Search
         </Button>
-      </div>
-      
-      
+      </div>            
     </Box>
   );
 }

@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
-import { GetLocalStorageData } from 'global/Local-Storage-Helper';
-// import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import SearchForm from 'components/search/SearchForm';
 import styles from 'styles/Search.module.css';
-import Button from '@mui/material/Button';
-import { LocalStoreList } from 'global/Local-Storage-Helper';
+import { LocalStoreList, DeleteLocalStoreListItem, GetLocalStorageData } from 'global/Local-Storage-Helper';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 
 export default function Search() {
-    let newDate = new Date()
-    let date = newDate.getDate();   
     
     const [searchHistory, setSearchHistory] = useState(GetLocalStorageData('SearchHist'));
     const [searchTerm, setSearchTerm] = useState('');
-
-    const maxItems = 6;
+    const maxDaysOld = 3;
     
-    const handleAddToList = (event) => {       
+    const handleChangeToList = (event) => {       
         setSearchHistory(GetLocalStorageData('SearchHist'));
     }
         
@@ -25,18 +22,27 @@ export default function Search() {
         setSearchTerm(event.target.value);    
     }
     
-    const handleSubmit = (event) => {
-        console.log(event);
-        // const maxListItemCount = 7;
-        var maxDaysOld = 3;
-      
+    const handleSubmit = (event) => {                
         LocalStoreList('SearchHist', searchTerm, maxDaysOld);
-        handleAddToList();
+        handleChangeToList();
+        setSearchTerm('');
     }
 
-    const handleClickOnLink = (val) => {       
-        console.log(val);
+    const handleClickOnLink = (val) => {               
         setSearchTerm(val);
+    }
+        
+    const handleDelete = (val) => {               
+        DeleteLocalStoreListItem('SearchHist', val);
+        handleChangeToList();
+    }
+
+    const handleKeyPress = (event) => {
+        if(event.keyCode === 13) {            
+            LocalStoreList('SearchHist', searchTerm, maxDaysOld);
+            handleChangeToList();
+            setSearchTerm('');                
+         }
     }
         
     return (
@@ -48,15 +54,21 @@ export default function Search() {
                         <Grid container spacing={2}>
                         
                             <Grid item xs={10} lg={10} xl={10}>
-                               <SearchForm handleAddToList={handleAddToList} 
+                               <SearchForm 
                                            handleChangeSearchTerm={handleChangeSearchTerm} 
                                            handleSubmit={handleSubmit}
+                                           handleKeyPress={handleKeyPress}
                                            searchTerm={searchTerm}/>
                             </Grid>
                             <Grid item xs={10} lg={10} xl={10}>
                                 <ul>
                                 {searchHistory.map((element) =>                                   
-                                <li><Button variant="text" onClick={(e) => handleClickOnLink(element.value)}>{element.value} - {element.date}</Button> </li>
+                                <li>
+                                    <Link href="#" underline="none"  onClick={(e) => handleClickOnLink(element.value)}>{element.value} - {element.date}</Link> 
+                                    <IconButton aria-label="delete" size="small" color="secondary" onClick={(e) => handleDelete(element.value)}>
+                                        <DeleteIcon fontSize="inherit" />
+                                    </IconButton>
+                                </li>
                                 )}  
                                 </ul>                                                                  
                             </Grid>

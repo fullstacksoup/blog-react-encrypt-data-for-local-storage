@@ -17,24 +17,50 @@ export function LocalStoreList(localSessionName, value, maxDaysOld) {
         
         var newDataArr = [];
         let dataArr = AESDecrypt(localStorage.getItem(localSessionName));      
-        
+        var isDuplicate= false;
         dataArr.forEach(element => {            
             let recordDate = new Date(element.date);           
             var daysDiff = differenceInDays(today, recordDate,  { addSuffix: false })
     
-            if(daysDiff <= maxDaysOld) {
+                if(daysDiff <= maxDaysOld) {
+                    newDataArr.push(element);    
+                    
+                    // Check for duplicate entry
+                    if(element.value.toLowerCase() === value.toLowerCase()) {
+                        isDuplicate = true;            
+                    }                                    
+                }                
+        });      
+
+        // Add new value if value is not a duplicate
+        if(!isDuplicate) {
+           newDataArr.push({value: value, date: cDate});        
+        }
+        
+        localStorage.setItem(localSessionName, AESEncrypt(newDataArr));                                                                  
+        return newDataArr;  
+    }
+}
+
+export function DeleteLocalStoreListItem(localSessionName, deleteValue) {    
+    var localStorageData = localStorage.getItem(localSessionName);        
+    
+    if(localStorageData !== null) {        
+        
+        var newDataArr = [];
+        let dataArr = AESDecrypt(localStorage.getItem(localSessionName));      
+        
+        dataArr.forEach(element => {                                                    
+            if(element.value !== deleteValue) {
                 newDataArr.push(element);    
             }                        
         });        
-        
-        newDataArr.push({value: value, date: cDate});        
+                
         localStorage.setItem(localSessionName, AESEncrypt(newDataArr));                                                      
             
         return newDataArr;  
     }
 }
-
-
 
 export function GetLocalStorageData(localSessionName) {    
     var data = localStorage.getItem(localSessionName);        
